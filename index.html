@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SUPERVECTAR VLC</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+      background: #0b0b0b;
+      color: #eee;
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #FFD700;
+      flex-wrap: wrap;
+      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    }
+
+    h1 .main-logo {
+      height: 1em;
+      width: auto;
+    }
+
+    h2 { font-size: 1.3rem; margin-top: 2rem; margin-bottom: 0.8rem; color: #FFD700; }
+
+    .search-box { text-align: center; margin-bottom: 20px; }
+    .search-box input {
+      width: 90%; max-width: 500px; padding: 10px;
+      border-radius: 8px; border: none; outline: none;
+      background: #222; color: #eee; font-size: 1rem;
+    }
+
+    .category-grid { display: flex; flex-direction: column; gap: 10px; }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 10px;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: scale(1.02); }
+
+    .card img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      margin-right: 10px;
+      background: #fff;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .card strong { color: #FFD700; flex: 1; font-size: 1rem; }
+
+    .actions { display: flex; gap: 5px; }
+    .actions button {
+      padding: 5px 8px; border: none; border-radius: 6px;
+      cursor: pointer; font-size: 0.8rem;
+    }
+    .btn-android { background: #4CAF50; color: #fff; }
+    .btn-ios { background: #2196F3; color: #fff; }
+    .btn-direct { background: #777; color: #fff; }
+
+    .no-results { text-align: center; color: #888; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>
+    <img src="http://i.ibb.co/FnGwW1c/Logo.png" alt="Logo" class="main-logo">
+    SUPERVECTAR VLC
+  </h1>
+<div id="notice">
+  ⚠️ Para reproducir los canales es necesario tener instalado el reproductor VLC: 
+  <a href="https://play.google.com/store/apps/details?id=org.videolan.vlc&hl=es" target="_blank">Descargar VLC Android</a>.
+  <a href="https://apps.apple.com/es/app/vlc-media-player/id650377962" target="_blank">Descargar VLC IOS</a>.
+</div>
+
+<style>
+  #notice a {
+    color: #FFD700; /* Amarillo dorado */
+    text-decoration: underline;
+  }
+
+  #notice a:hover {
+    color: #FFA500; /* Amarillo más intenso al pasar el mouse */
+  }
+</style>
+
+  <div class="search-box">
+    <input type="text" id="search" placeholder="🔍 Buscar canal..." />
+  </div>
+
+  <div id="container"></div>
+  <div class="no-results" style="display:none;">No se encontraron canales 😕</div>
+
+  <script>
+    const categorias = [
+      {
+        nombre: "Fútbol",
+        canales: [
+          { nombre: "Movistar LaLiga 1", url: "http://vlc.shickat.me:8000/pid/107c3ce5a5d2527c9f06e4eab87477201791f231/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/15/LaLigaTV_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar LaLiga 2", url: "https://bit.ly/CanallaligadeDiego", logo: "https://upload.wikimedia.org/wikipedia/commons/1/15/LaLigaTV_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar LaLiga 3", url: "http://vlc.shickat.me:8000/pid/d2ddf9802ccfdc456f872eea4d24596880a638a0/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/15/LaLigaTV_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar LaLiga 4", url: "http://vlc.shickat.me:8000/pid/4b528d10eaad747ddf52251206177573ee3e9f74/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/15/LaLigaTV_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "DAZN LaLiga 1", url: "http://vlc.shickat.me:8000/pid/1bb5bf76fb2018d6db9aaa29b1467ecdfabe2884/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/85/DAZN_LALIGA_2024_logo.svg" },
+          { nombre: "DAZN LaLiga 2", url: "http://vlc.shickat.me:8000/pid/c9321006921967d6258df6945f1d598a5c0cbf1e/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/85/DAZN_LALIGA_2024_logo.svg" },
+          { nombre: "DAZN LaLiga 3", url: "http://vlc.shickat.me:8000/pid/4e6d9cf7d177366045d33cd8311d8b1d7f4bed1f/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/85/DAZN_LALIGA_2024_logo.svg" },
+          { nombre: "DAZN LaLiga 4", url: "http://vlc.shickat.me:8000/pid/0e50439e68aa2435b38f0563bb2f2e98f32ff4b1/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/85/DAZN_LALIGA_2024_logo.svg" },
+          { nombre: "DAZN 1", url: "http://vlc.shickat.me:8000/pid/b03f9310155cf3b4eafc1dfba763781abc3ff025/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/0/06/DAZN_Logo_Master.svg" },
+          { nombre: "DAZN 1 extra", url: "http://vlc.shickat.me:8000/pid/6538b79ce0da657d8455d1da6a5f342398899a0e/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/0/06/DAZN_Logo_Master.svg" },
+          { nombre: "DAZN 1 extra adicional", url: "http://vlc.shickat.me:8000/pid/bae98f69fbf867550b4f73b4eb176dae84d7f909/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/0/06/DAZN_Logo_Master.svg" },
+          { nombre: "Eurosport 1", url: "http://vlc.shickat.me:8000/pid/5c910d614894635153a7d42de98cc2e4a958a53f/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/17/Eurosport_Logo_2015.svg" },
+          { nombre: "Eurosport 2", url: "http://vlc.shickat.me:8000/pid/97df5b7824948972d041d8ca2a4d29c90b641bc9/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/17/Eurosport_Logo_2015.svg" },
+          { nombre: "Movistar Liga Campeones 1", url: "http://vlc.shickat.me:8000/pid/38e9ae1ee0c96d7c6187c9c4cc60ffccb565bdf7/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Liga_de_Campeones_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar Liga Campeones 2", url: "http://vlc.shickat.me:8000/pid/0f7842f8b6c26571e5a974407b61623e56e6a052/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Liga_de_Campeones_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar Liga Campeones 3", url: "http://vlc.shickat.me:8000/pid/f3eea003e23f94dc2d527306de9dd386e3ebf4ba/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Liga_de_Campeones_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar #Vamos 1", url: "http://vlc.shickat.me:8000/pid/4e99e755aa32c4bc043a4bb1cd1de35f9bd94dde/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Vamos_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar #Vamos 2", url: "http://vlc.shickat.me:8000/pid/c7c81acdd1a03ecc418c94c2f28e2adb0556c40b/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Vamos_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "LaLiga Hypermotion", url: "http://vlc.shickat.me:8000/pid/70f22be1286ef224b5e4e9451d9a42468152cda4/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8b/LaLiga_TV_Hypermotion_2023_Logo.svg" }
+        ]
+      },
+      {
+        nombre: "Fórmula 1",
+        canales: [
+          { nombre: "F1 Main", url: "http://vlc.shickat.me:8000/pid/36394be1db2e20b5997d987c32fd38c7f0f194b7/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" },
+          { nombre: "F1 Extra", url: "http://vlc.shickat.me:8000/pid/4e401fdceebffdf1f09aef954844d09f6c62f460/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" }
+        ]
+      },
+      {
+        nombre: "Deportes",
+        canales: [
+          { nombre: "Movistar Deportes 1", url: "http://vlc.shickat.me:8000/pid/3692ea4cdda97eb0062ed5d656ebd61f149ebd0b/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/d/db/Deportes_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar Deportes 2", url: "http://vlc.shickat.me:8000/pid/edd06f11e1cef292a1d795e15207ef2f580e298c/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/d/db/Deportes_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar Deportes Extra", url: "http://vlc.shickat.me:8000/pid/8ee52f6208e33706171856f99d2ed2dabd317f3a/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/d/db/Deportes_por_Movistar_Plus%2B_2023_Logo.svg" }
+        ]
+      },
+      {
+        nombre: "Cine / Series",
+        canales: [
+          { nombre: "Movistar Plus 1", url: "http://vlc.shickat.me:8000/pid/199190e3f28c1de0be34bccf0d3568dc65209b99/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Movistar_Plus%2B_2022_logo.svg" },
+          { nombre: "Movistar Plus 2", url: "http://vlc.shickat.me:8000/pid/b6ffbbc72a5b6b579faf79ebac229af7a25b933b/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Movistar_Plus%2B_2022_logo.svg" },
+          { nombre: "Movistar Originales", url: "http://vlc.shickat.me:8000/pid/096b817fcc836535f608facb15fca6408fae3162/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Originales_por_Movistar_Plus%2B_2023_Logo.svg" },		  
+          { nombre: "Movistar Estrenos", url: "http://vlc.shickat.me:8000/pid/5d35f906b735f25164fa2b9b7a4e6ef91dfed131/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/5/59/Estrenos_por_Movistar_Plus%2B_2025_Logo.svg" },
+          { nombre: "Cine Español", url: "http://vlc.shickat.me:8000/pid/e4bce95dd4faeb9cb09ade36a0636bc4b22b691c/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Cine_Espa%C3%B1ol_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Comedia", url: "http://vlc.shickat.me:8000/pid/cf0cb321eed6765c2eadbd9983570f6674ce5df6/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/6/69/Comedia_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Drama", url: "http://vlc.shickat.me:8000/pid/a6de6a4977d7801bbddc9c7739d822f4beb358ae/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/6/62/Drama_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Acción 1", url: "http://vlc.shickat.me:8000/pid/089673779de9fa7a18ac8dc26eb4a79cf5a86f96/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Acci%C3%B3n_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Acción 2", url: "http://vlc.shickat.me:8000/pid/102bcb79ca391e37ac1fc9ee77dc53440d0a59ce/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Acci%C3%B3n_por_Movistar_Plus%2B_2023_Logo.svg" },
+          { nombre: "Movistar Clásicos", url: "http://vlc.shickat.me:8000/pid/e4bce95dd4faeb9cb09ade36a0636bc4b22b691c/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/d/dd/Cl%C3%A1sicos_por_Movistar_Plus%2B_2023_Logo.svg" }
+        ]
+      },
+      {
+        nombre: "Documentales",
+        canales: [
+          { nombre: "Movistar Documentales", url: "http://vlc.shickat.me:8000/pid/b3fc9b5647c5933b101c0b6b64322590c68587b9/stream.mp4", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d2/Documentales_por_Movistar_Plus%2B_2023_Logo.svg" }
+        ]
+      }
+    ];
+
+    function isAndroid() { return /Android/i.test(navigator.userAgent); }
+    function isIOS() { return /iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
+    function openWithAndroidIntent(url) {
+      const fallback = encodeURIComponent(url);
+      const urlNoScheme = url.replace(/^https?:\/\//i, '');
+      const intentUri = 'intent://' + urlNoScheme +
+        '#Intent;scheme=http;package=org.videolan.vlc;S.browser_fallback_url=' + fallback + ';end';
+      window.location.href = intentUri;
+    }
+
+    function openWithiOSVLC(url) {
+      const uri = 'vlc-x-callback://x-callback-url/stream?url=' + encodeURIComponent(url);
+      window.location.href = uri;
+    }
+
+    function openDirect(url) { window.open(url, '_blank', 'noopener'); }
+
+    const container = document.getElementById('container');
+
+    categorias.forEach(cat => {
+      const titulo = document.createElement('h2');
+      titulo.textContent = cat.nombre;
+      container.appendChild(titulo);
+
+      const grid = document.createElement('div');
+      grid.className = 'category-grid';
+      container.appendChild(grid);
+
+      cat.canales.forEach(ch => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('data-nombre', ch.nombre.toLowerCase());
+
+        card.innerHTML = `
+          <img src="${ch.logo}" alt="logo">
+          <strong>${ch.nombre}</strong>
+          <div class="actions">
+            <button class="btn-android">📱 Android</button>
+            <button class="btn-ios">🍎 iOS</button>
+            <button class="btn-direct">🌐 Web</button>
+          </div>
+        `;
+
+        card.querySelector('.btn-android').addEventListener('click', () => {
+          if (isAndroid()) openWithAndroidIntent(ch.url);
+          else alert('Solo para Android');
+        });
+        card.querySelector('.btn-ios').addEventListener('click', () => {
+          if (isIOS()) openWithiOSVLC(ch.url);
+          else alert('Solo para iPhone/iPad');
+        });
+        card.querySelector('.btn-direct').addEventListener('click', () => openDirect(ch.url));
+
+        grid.appendChild(card);
+      });
+    });
+
+    const searchInput = document.getElementById('search');
+    const noResults = document.querySelector('.no-results');
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase();
+      const cards = document.querySelectorAll('.card');
+      let visible = 0;
+
+      cards.forEach(card => {
+        const name = card.getAttribute('data-nombre');
+        if (name.includes(query)) {
+          card.style.display = 'flex';
+          visible++;
+        } else { card.style.display = 'none'; }
+      });
+
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>
